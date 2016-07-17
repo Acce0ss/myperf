@@ -90,11 +90,12 @@ getStrips cols rows =
 
 getBoardOutline :: Float -> Float -> [String]
 getBoardOutline w h =
-  let leftSide = "WIRE 0 " ++ (show (Point 0 0)) ++ " " ++ (show (Point 0 h))
+  let layerSetting = "LAYER 20;"
+      leftSide = "WIRE 0 " ++ (show (Point 0 0)) ++ " " ++ (show (Point 0 h))
       topSide = "WIRE 0 " ++ (show (Point 0 h)) ++ " " ++ (show (Point w h))
       rightSide = "WIRE 0 " ++ (show (Point w h)) ++ " " ++ (show (Point w 0))
       bottomSide = "WIRE 0 " ++ (show (Point w 0)) ++ " " ++ (show (Point 0 0))
-  in leftSide:topSide:rightSide:bottomSide:[]
+  in layerSetting:leftSide:topSide:rightSide:bottomSide:[]
 
 getHoleCommands :: Int -> Int -> [String]
 getHoleCommands cols rows =
