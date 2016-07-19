@@ -23,20 +23,21 @@ distFromHole :: Float
 distFromHole = spacing / 3.333
 
 bottomAndLeftMargin :: Float
-bottomAndLeftMargin = spacing / 2
+bottomAndLeftMargin = spacing
 
 createPerfScript :: [String] -> String
 createPerfScript [width, height] =
   let w = read width
       h = read height
-      cols = round $ (w - spacing*1.5) / spacing
-      rows = round $ (h - spacing*1.5) / spacing
+      cols = round $ (w - spacing*2.5) / spacing
+      rows = round $ (h - spacing*2.5) / spacing
       gridUnitSetting = ["GRID MM;"]
       strips = getStrips cols rows
-      labels = getLabels cols rows
+      labels = getLabels cols rows 25
+      botlabels = getLabels cols rows 26
       outline = getBoardOutline w h
-      signature = getSignature (Point (-spacing/3) (spacing/5))
-  in unlines $ gridUnitSetting ++ strips ++ labels ++
+      signature = getSignature (Point (-spacing/1.25) (-spacing/4))
+  in unlines $ gridUnitSetting ++ strips ++ labels ++ botlabels ++
      outline ++ signature
 
 getSignature :: Point -> [String]
@@ -44,21 +45,23 @@ getSignature (Point x y) =
   let layerSetting = "LAYER 25;"
       fontSetting = "CHANGE FONT Vector"
       alignSetting = "CHANGE ALIGN Left"
-      sizeSetting = "CHANGE SIZE 0.9"
-      settings = layerSetting:fontSetting:alignSetting:sizeSetting:[]
-      pos = Point x y
-      cpos = Point x (y+1)
-      vpos = Point x (y-1)
+      sizeSetting = "CHANGE SIZE 1.7"
+      ratioSetting = "CHANGE RATIO 10"
+      settings = layerSetting:fontSetting:alignSetting:sizeSetting:ratioSetting:[]
+      vpos = Point x y
+      cpos = Point x (y+1.7)
+      pos = Point x (y-1.7)
   in settings ++ [labelCommand pos "Acce", labelCommand cpos "'(C)'",
                   labelCommand vpos "'v0.1'"]
 
-getLabels :: Int -> Int -> [String]
-getLabels cols rows =
-  let layerSetting = "LAYER 25;"
+getLabels :: Int -> Int -> Int -> [String]
+getLabels cols rows layer =
+  let layerSetting = "LAYER " ++ (show layer) ++ ";"
       fontSetting = "CHANGE FONT Vector"
       alignSetting = "CHANGE ALIGN Center"
-      sizeSetting = "CHANGE SIZE 0.9"
-      settings = layerSetting:fontSetting:alignSetting:sizeSetting:[]
+      sizeSetting = "CHANGE SIZE 1.7"
+      ratioSetting = "CHANGE RATIO 10"
+      settings = layerSetting:fontSetting:alignSetting:sizeSetting:ratioSetting:[]
       horzLabels = horizontalLabels cols rows
       vertLabels = verticalLabels cols rows
   in settings ++ horzLabels ++ vertLabels
@@ -66,14 +69,14 @@ getLabels cols rows =
 horizontalLabels :: Int -> Int -> [String]
 horizontalLabels cols rows =
   let letterLabels = map (:[]) ['A'..'Z'] ++ [[a,x] | a <- ['A'..'Z'], x <- ['A'..'Z']]
-      y = ((fromIntegral rows) + 0.8) * spacing
+      y = ((fromIntegral rows) + 1.1) * spacing
       positions = foldr (\x acc -> (Point (x*spacing) y):acc) [] (map fromIntegral [1..cols])
   in foldr (\x acc -> (labelCommand (fst x) (snd x)):acc) [] (zip positions letterLabels)
 
 verticalLabels :: Int -> Int -> [String]
 verticalLabels cols rows =
   let numberLabels = map show (reverse [1..rows])
-      x = ((fromIntegral cols) + 0.75) * spacing
+      x = ((fromIntegral cols) + 1.1) * spacing
       positions = foldr (\y acc -> (Point x (y*spacing)):acc) [] (map fromIntegral [1..rows])
   in foldr (\x acc -> (labelCommand (fst x) (snd x)):acc) [] (zip positions numberLabels)
 
@@ -178,7 +181,7 @@ verticalStripStopmask (row, col) acc =
   let baseX = (fromIntegral col) * spacing
       baseY = (fromIntegral row) * spacing
       topLeft = Point ( baseX+spacing/3.333 + distFromHole) (baseY + padWidth/2 + spacing/24)
-      bottomRight = Point ( baseX+spacing/10+padWidth/3) (baseY - padWidth/2 - spacing/24)
+      bottomRight = Point ( baseX+spacing/10+padWidth/4) (baseY - padWidth/2 - spacing/24)
       stripForSpot = rectCommand topLeft bottomRight
   in stripForSpot:acc      
 
