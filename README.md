@@ -5,7 +5,14 @@ Creates a Cadsoft Eagle script that draws a perf board
 with labeled matrix strips, given the board dimensions.
 
 The perf vias are separated by 0.1 inches, so standard pin
-header and PTH packages should fit without problems.
+header and plated-through hole packages such as DIP 
+should fit without problems.
+
+The idea of the strip matrix is to reduce need for jump
+wires and soldering pathways. It is fairly flexible to
+route via the matrix, given that you have something sharp
+enough to occasionally cut the strip, e.g. under your
+DIP packaged chip.
 
 compilation:
 ```
